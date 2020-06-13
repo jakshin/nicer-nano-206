@@ -1,0 +1,19 @@
+syntax "ini" "\.(ini|ini.default)$" "\.?gitconfig$"
+
+# Numbers
+color magenta "[0-9]+[[:space:]]*([;#]|$)"
+
+# Strings
+color green "\"(\\.|[^\"])*\"" "'(\\.|[^'])*'"
+
+# Property names
+color blue "^[[:space:]]*[^=]+="
+
+# Section headers
+color cyan "^[[:space:]]*\[.*\]$"
+
+# Comments
+color brightblack "(^|[[:space:]])(#([^{].*)?|;.*)$"
+
+# Mixed tabs & spaces
+color ,red "	+ +| +	+"

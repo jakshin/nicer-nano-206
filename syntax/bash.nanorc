@@ -1,0 +1,29 @@
+syntax "bash" "\.sh$" "\.?(bashrc|bash_login|bash_logout|bash_profile|profile)$"
+
+# Function declarations
+icolor cyan "^[[:space:]]*(function)?[[:space:]]+[0-9A-Z_-]+[[:space:]]*\(\)"
+
+# Keywords
+color blue "[[:<:]](case|do|done|elif|else|esac|fi|for|function|if|in|select|then|time|until|while)[[:>:]]"
+
+# Builtins
+color cyan "[[:<:]](alias|bg|bind|break|builtin|caller|cd|command|compgen|complete|continue|declare|dirs|disown|echo|enable|eval|exec|exit|export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|local|logout|popd|printf|pushd|pwd|read|readonly|return|set|shift|shopt|source|suspend|test|times|trap|true|type|typeset|ulimit|umask|unalias|unset|wait)[[:>:]]"
+
+# Conditionals
+color white "\[\[.*\]\]" "\(\(.*\)\)"
+
+# Numbers
+color magenta "[[:<:]][+-]?[0-9]+(\.[0-9]+)?[[:>:]]"
+
+# Strings
+color green "\"(\\.|[^\"])*\"" "'(\\.|[^'])*'"
+color brightgreen "`[^`]+`"
+
+# Variables
+icolor brightwhite "\$\{?[0-9A-Z_!@#$*?-]+\}?"
+
+# Comments
+color brightblack "(^|[[:space:]])#.*$"
+
+# Mixed tabs & spaces
+color ,red "	+ +| +	+"

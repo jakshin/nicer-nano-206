@@ -1,0 +1,20 @@
+syntax "nanorc" "[\.]*nanorc$"
+
+# Options
+color cyan "^[ 	]*(set|unset)[ 	]+(autoindent|backup|backwards|boldtext|casesensitive|const|cut|historylog|morespace|mouse|multibuffer|noconvert|nofollow|nohelp|nonewlines|nowrap|preserve|quickblank|rebinddelete|rebindkeypad|regexp|smarthome|smooth|suspend|tabstospaces|tempfile|view|wordbounds)[ 	]*$"
+color cyan "^[ 	]*set[ 	]+fill[ 	]+-?[0-9]+[ 	]*$"
+color cyan "^[ 	]*set[ 	]+tabsize[ 	]+[0-9]+[ 	]*$"
+color cyan "^[ 	]*set[ 	]+(backupdir|brackets|matchbrackets|operatingdir|punct|quotestr|speller|whitespace)[ 	]+.+[ 	]*$"
+
+# Syntax definitions
+# Note that files referenced by `include` can only contain `syntax`, `color` and `icolor` commands
+# The color/icolor commands also have this form: i?color fgcolor,bgcolor start="start-regex" end="end-regex"
+color cyan "^[ 	]*syntax[ 	]"
+color cyan "^[ 	]*i?color[ 	]+(bright|,)?(green|red|blue|white|yellow|cyan|magenta|black)(,(green|red|blue|white|yellow|cyan|magenta|black))?[  ]"
+color cyan "^[ 	]*include[ 	]"
+
+# Strings
+color green "\"(\\.|[^\"])*\""
+
+# Comments
+color brightblack "^[ 	]*#.*$"

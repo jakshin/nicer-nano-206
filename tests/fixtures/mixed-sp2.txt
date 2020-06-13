@@ -1,0 +1,8 @@
+These lines are indented with tabs:
+	<-- tab
+	<-- tab
+
+These lines are indented with spaces:
+  <-- spaces
+  <-- spaces
+  <-- spaces

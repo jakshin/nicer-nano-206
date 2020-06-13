@@ -1,0 +1,34 @@
+# Configuration file for GNU nano v2.0.6 on macOS
+# For details, see https://www.nano-editor.org/dist/v2.0/nanorc.5.html
+# or download https://www.nano-editor.org/dist/v2.0/nano-2.0.6.tar.gz
+
+# A few niceties, including "smooth" scrolling (line-by-line),
+# the ability to suspend nano with Ctrl+Z, and sane default tab stops
+set morespace
+set smarthome
+set smooth
+set suspend
+set tabsize 4
+
+# Automatic indentation is handy when writing/editing indented files like code,
+# but super-annoying when pasting code into nano v2.0.6, so default it off (Alt+I toggles it)
+unset autoindent
+
+# Default this off, so nano-smart-indent.sh can pass `--tabstospaces` as needed,
+# as nano has no command-line parameter to turn it off, if it's enabled here (Alt+Q toggles it)
+#
+# NOTE: Enabling tabstospaces here breaks nano-smart-indent.sh's logic,
+# but to prefer spaces whenever detecting the indentation of existing files is inconclusive,
+# `export NANO_SMART_INDENT_PREFER_SPACES=true` in ~/.bashrc and/or ~/.zshrc
+unset tabstospaces
+
+# Syntax highlighting
+include "~/.nano-syntax/bash.nanorc"
+include "~/.nano-syntax/conf.nanorc"
+include "~/.nano-syntax/etc-hosts.nanorc"
+include "~/.nano-syntax/git.nanorc"
+include "~/.nano-syntax/ini.nanorc"
+include "~/.nano-syntax/json.nanorc"
+include "~/.nano-syntax/nanorc.nanorc"
+include "~/.nano-syntax/yaml.nanorc"
+include "~/.nano-syntax/zsh.nanorc"

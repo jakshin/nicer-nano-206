@@ -1,0 +1,7 @@
+syntax "conf" "\.conf$"
+
+# Comments
+color brightblack "^[[:space:]]*#.*$"
+
+# Mixed tabs & spaces
+color ,red "	+ +| +	+"

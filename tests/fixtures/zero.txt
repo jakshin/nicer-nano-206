@@ -1,0 +1,6 @@
+This file doesn't use any indentation.
+None at all.
+Not a single line is indented.
+		
+^ That line above has tabs on it, but that doesn't count,
+because the line is all whitespace, and gets skipped.

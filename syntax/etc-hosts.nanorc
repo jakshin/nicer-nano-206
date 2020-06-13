@@ -1,0 +1,11 @@
+syntax "/etc/hosts" "hosts"
+
+# IP addresses (IPv4 and IPv6)
+color cyan "^[0-9\.]+[[:space:]]"
+icolor cyan "^[0-9a-f:]+[[:space:]]"
+
+# Comments
+color brightblack "#.*"
+
+# Mixed tabs & spaces
+color ,red "	+ +| +	+"
