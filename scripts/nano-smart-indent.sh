@@ -116,7 +116,6 @@ fi
 if [[ $will_edit == true && ${#files[@]} != 0 && ($tabstospaces == "" || $tabsize == "") ]]; then
 	if [[ $NANO_SMART_INDENT_NO_EDITORCONFIG != true ]] && type -t editorconfig > /dev/null; then
 		use_editorconfig=true
-		[[ $PWD == "/" ]] && cwd="/" || cwd="$PWD/"
 	fi
 
 	script_dir="$(dirname -- "$0")"
@@ -129,8 +128,7 @@ if [[ $will_edit == true && ${#files[@]} != 0 && ($tabstospaces == "" || $tabsiz
 		_indent_style="" _indent_size=""  # Assigned in use-editorconfig/detect-indent
 
 		if [[ $use_editorconfig == true && -n $file ]]; then
-			# FIXME call use-editorconfig
-			[[ $file == /* ]] && abs_file="$file" || abs_file="${cwd}${file}"
+			: # FIXME call use-editorconfig
 		fi
 
 		detect-indent "$file"  # Sets $_indent_style/$_indent_size

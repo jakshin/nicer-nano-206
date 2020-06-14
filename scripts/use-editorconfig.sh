@@ -5,26 +5,30 @@
 # Copyright (c) 2020 Jason Jackson. MIT License.
 #
 
-# FIXME should we disallow directories, devices, etc?
-
 function use-editorconfig() {
 	local file_path="$1"
 
 	export _indent_style=""  # Return value, "tab" or "space"
 	export _indent_size=""   # Return value, number of spaces
 
+	[[ -r $file_path && -f $file_path ]] || return 0
+
+	if [[ $file_path != /* ]]; then
+		[[ $PWD == "/" ]] && file_path="/$file_path" || file_path="$PWD/$file_path"
+	fi
+
 	local line
 	while IFS="" read -r line; do
 		line="${line//[$'\t ']/}"
 
-		if [[ $line == "indent_style=" ]]; then
+		if [[ $line == "indent_style="* ]]; then
 			local indent_style="${line//*=/}"
-		elif [[ $line == "indent_size=" ]]; then
+		elif [[ $line == "indent_size="* ]]; then
 			local indent_size="${line//*=/}"
-		elif [[ $line == "tab_width=" ]]; then
+		elif [[ $line == "tab_width="* ]]; then
 			local tab_width="${line//*=/}"
 		fi
-	done < <( editorconfig "$file_path" )
+	done < <( editorconfig "$file_path" 2> /dev/null )
 
 	if [[ $indent_style == "space" ]]; then
 		_indent_style="space"
