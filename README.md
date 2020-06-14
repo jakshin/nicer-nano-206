@@ -10,14 +10,11 @@ You get some sensible default settings; cohesive syntax highighting in common fi
 ## Installing and Uninstalling
 
 To **install**, just clone the repo and run its install script, i.e. run something like the following in Terminal.app:   
-`git clone https://github.com/jakshin/nicer-nano.git ~/.nicer-nano && ~/.nicer-nano/install.sh`
+`git clone https://github.com/jakshin/nicer-nano-206.git ~/.nicer-nano && ~/.nicer-nano/install.sh`
 
 _(You can clone the repo anywhere you like, `~/.nicer-nano` is just an example.)_
 
-To **uninstall** (i.e. remove the symlinks at `~/.nanorc` and `~/.nano-syntax`), use the repo's uninstall script:   
-`~/.nicer-nano/uninstall.sh`
-
-_(Use `uninstall.sh --hard` to remove your local repo itself, as well as the symlinks.)_
+To **uninstall** (i.e. remove the symlinks at `~/.nanorc` and `~/.nano-syntax`, and your local clone of the nicer-nano-206 repo), use the repo's uninstall script: `~/.nicer-nano/uninstall.sh`
 
 
 ## Compatibility
