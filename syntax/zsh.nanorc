@@ -1,3 +1,4 @@
+# Syntax definitions for Zsh shell scripts and config files
 syntax "zsh" "\.zsh$" "\.?(zshenv|zprofile|zshrc|zlogin|zlogout|zsh-theme)$"
 
 # Function declarations
