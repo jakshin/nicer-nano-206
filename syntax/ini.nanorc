@@ -1,4 +1,5 @@
-syntax "ini" "\.(ini|ini.default)$" "\.?gitconfig$"
+# Syntax definitions for INI files, and similarly-structured files
+syntax "ini" "\.(ini|ini.default)$" "\.editorconfig$" "\.?gitconfig$"
 
 # Numbers
 color magenta "[0-9]+[[:space:]]*([;#]|$)"
