@@ -1,3 +1,5 @@
+# Syntax definitions for various interactive Git operations
+
 # --- Committing without `-m`, amending a commit, creating a commit message after squashing commits, etc. ---
 syntax "git-commit" "COMMIT_EDITMSG|TAG_EDITMSG"
 
