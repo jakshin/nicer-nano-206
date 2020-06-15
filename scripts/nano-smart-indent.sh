@@ -1,37 +1,44 @@
 #!/bin/bash
 #
-# A wrapper script for nano; it passes its arguments through to the real nano, and also
-# tries to detect whether the file(s) being opened should use spaces or tabs for indentation,
-# and adjust nano's behavior accordingly by passing it `--tabstospaces` and/or `--tabsize`,
-# so nano's indentation behavior will "automatically" match the file being edited.
+# This is a wrapper script for nano, which passes its arguments to nano, after first trying to
+# figure out the best indentation settings for the file(s) being edited, and passing additional
+# options to nano to adjust its indentation behavior as needed. The most convenient way to use
+# it is through an alias: alias nano=/path/to/nano-smart-indent.sh
 #
-# If nano is being opened with a new/non-existent file, or multiple files with different
-# indentation styles from each other, this script doesn't pass any extra options to nano
-# (although it still passes through any options received on its own command line, of course).
+# It first tries to use EditorConfig settings, as reported by the editorconfig CLI. This works
+# on both existing and new files, since finding a relevant .editorconfig file only depends on
+# the edited file's path. If the editorconfig CLI isn't installed, this step is skipped; if it
+# is installed but you don't want this script to use it, put this in your .bashrc and/or .zshrc:
+# export NANO_SMART_INDENT_NO_EDITORCONFIG=true
+#
+# If EditorConfig settings aren't found (or aren't used), the script next tries to read up to
+# 20 KB from the file, and detect its indentation style. This, of course, only works on files
+# that already exist.
+#
+# For all of this to work, neither /etc/nanorc nor ~/.nanorc can contain "set tabstospaces";
+# that's because nano doesn't provide a command-line option which tells it to use tabs for
+# indentation, so if you've told it to use spaces for indentation in one of its config files,
+# this script has no way to change that setting. And _that_, in turn, means that if this script
+# can't detect a file's indentation style, nano's default setting of using tabs for indentation
+# will come into play. If you're more a spaces-for-indentation kind of person, put this into
+# your .bashrc and/or .zshrc to tell this script to default to having nano indent with spaces
+# when it can't figure out what else to do: export NANO_SMART_INDENT_PREFER_SPACES=true
+#
+# You can always pass --tabstospaces (or -E) if you want to indent a given file with spaces,
+# and this script will dutifully pass that setting along to nano, regardless of what EditorConfig
+# thinks or the contents already in the file. You can also pass --tabs, which isn't an actual
+# nano option, but which this script takes as the opposite of --tabstospaces, and which will
+# make it _not_ tell nano to indent with spaces, regardless of EditorConfig's opinion, etc.
+# If you pass both --tabstospaces and --tabs, --tabstospaces always wins, regardless of order.
+#
+# The --tabsize (or -T) option is also passed through, setting the tab display width when
+# indenting with tabs, or the number of spaces to use when indenting with spaces. If you don't
+# pass it, either the relevant EditorConfig setting or the existing indentation width in the file
+# will be used, or - if neither of those are applicable/available - the `tabsize` setting from
+# nano's config files, or its compiled-in default of 8.
 #
 # Copyright (c) 2020 Jason Jackson. MIT License.
 #
-
-
-
-# FIXME explain all of the below in the README
-
-# allow passing --tabs to suppress indentation detection and use tabs;
-# if you also pass --tabstospaces, it wins, even if it was passed first
-
-# would be nice to be able to default to spaces for indentation, when detection doesn't work;
-# if $NANO_SMART_INDENT_PREFER_SPACES is true, pass --tabstospaces to nano (without --tabsize),
-# in the case where detect-indent returns an empty string
-
-
-# FIXME if `editorconfig` CLI is installed, use it for each file, with conflict detection, 
-# unless an environment variable suppresses it: NANO_SMART_INDENT_NO_EDITORCONFIG=true
-# https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties:
-# use indent_style, indent_size, tab_width
-# could also use insert_final_newline, max_line_length, but maybe save those for nano-editorconfig?
-# (If insert_final_newline = false, and your a ends in a newline, VS Code's EditorConfig plugin doesn't remove it)
-
-
 
 # Parse the command line like nano v2.0.6 will
 # (Just enough to understand which file(s) will be edited, and a few relevant options)
@@ -109,67 +116,68 @@ if [[ -n $maybe_file ]]; then
 	files+=("$maybe_file")
 fi
 
-# FIXME test: if tabstospaces is true and we do detection to get the tab size,
-# what should we do if we detect tabs? just don't send --tabsize=tab to nano
-
 # Detect indentation, if needed
-if [[ $will_edit == true && ${#files[@]} != 0 && ($tabstospaces == "" || $tabsize == "") ]]; then
+if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsize) ]]; then
 	if [[ $NANO_SMART_INDENT_NO_EDITORCONFIG != true ]] && type -t editorconfig > /dev/null; then
 		use_editorconfig=true
 	fi
 
-	script_dir="$(dirname -- "$0")"
-	source "$script_dir/detect-indent.sh"  # FIXME do this conditionally, below
-
+	indent_conflict=false
 	indent_style=""
 	indent_size=""
 
 	for file in "${files[@]}"; do
 		_indent_style="" _indent_size=""  # Assigned in use-editorconfig/detect-indent
 
-		if [[ $use_editorconfig == true && -n $file ]]; then
-			: # FIXME call use-editorconfig
-		fi
+		if [[ -n $file ]]; then
+			[[ $use_editorconfig == true ]] && use-editorconfig "$file"  # Sets $_indent_style/$_indent_size
 
-		detect-indent "$file"  # Sets $_indent_style/$_indent_size
-
-		if [[ -n $_indent_style ]]; then
-			if [[ -n $indent_style && "$indent_style" != "$_indent_style" ]]; then
-				# Conflicting indentation style detected across multiple files -- pull the ripcord
-				indent_style=""
-				break  # FIXME set a flag value like we we with indent_size
-			else
-				indent_style="$_indent_style"
+			if [[ (-z $tabstospaces && -z $_indent_style) || (-z $tabsize && -z $_indent_size) ]]; then
+				type -d detect-indent > /dev/null || source "$(dirname -- "$0")/detect-indent.sh"
+				detect-indent "$file"  # Sets $_indent_style/$_indent_size
 			fi
 		fi
 
-		if [[ -n $_indent_size && $indent_size != "-" ]]; then
-			if [[ -n $indent_size && "$indent_size" != "$_indent_size" ]]; then
-				# Conflicting indent size detected across multiple files; set a flag value
-				# and give up on auto-configuring indent size, but keep trying for indent style
-				indent_size="-"
-			else
+		# if tabstospaces isn't set, and we detected an indent style:
+		# 	if we don't have an indent style yet, adopt the one we detected
+		# 	else if the detected style doesn't match the previous one, conflict & break
+		if [[ -z $tabstospaces && -n $_indent_style ]]; then
+			if [[ -z $indent_style ]]; then
+				indent_style="$_indent_style"
+			elif [[ "$indent_style" != "$_indent_style" ]]; then
+				indent_conflict=true
+				break
+			fi
+		fi
+
+		# if tabsize isn't set, and we detected an indent size:
+		# 	if we don't have an indent size yet, adopt the one we detected
+		# 	else if the detected size doesn't match the previous one:
+		# 		if indent style is space, conflict & break
+		if [[ -z $tabsize && -n $_indent_size ]]; then
+			if [[ -z $indent_size ]]; then
 				indent_size="$_indent_size"
+			elif [[ "$indent_size" != "$_indent_size" && "$indent_style" == "space" ]]; then
+				indent_conflict=true
+				break
 			fi
 		fi
 	done
 fi
 
-if [[ $indent_size == "-" ]]; then
-	indent_size=""
-fi
+# FIXME Prompt if we've detected conflicting indentation styles
 
 # Run nano
 [[ $NANO_SMART_INDENT_TESTING == true ]] && cmd="echo" || cmd="exec"
 cmd="echo" # FIXME testing
 
-if [[ $tabstospaces == "" &&
+if [[ -z $tabstospaces &&
 	($indent_style == "space" || ($indent_style == "" && $NANO_SMART_INDENT_PREFER_SPACES == true)) ]]
 then
 	nano_args="--tabstospaces"
 fi
 
-if [[ $tabsize == "" && $indent_size != "" ]]; then
+if [[ -z $tabsize && -n $indent_size ]]; then
 	[[ -z $nano_args ]] || nano_args+=" "
 	nano_args+="--tabsize=$indent_size"
 fi
