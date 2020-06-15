@@ -1,3 +1,4 @@
+# Syntax definitions for YAML
 syntax "yaml" "\.ya?ml$"
 
 # Values (including numbers and some keywords)
