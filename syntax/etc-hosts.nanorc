@@ -1,3 +1,4 @@
+# Syntax definitions for /etc/hosts
 syntax "/etc/hosts" "hosts"
 
 # IP addresses (IPv4 and IPv6)
