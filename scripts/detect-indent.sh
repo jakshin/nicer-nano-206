@@ -18,7 +18,7 @@ function detect-indent() {
 	export _indent_style=""  # Return value, "tab" or "space"
 	export _indent_size=""   # Return value, number of spaces (iff _indent_style is "space")
 
-	[[ -r $file_path && -f $file_path ]] || return
+	[[ -r $file_path && -f $file_path ]] || return 0
 
 	local spaced_count=0 tabbed_count=0  # Counts of lines indented with spaces/tabs
 
