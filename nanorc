@@ -14,12 +14,13 @@ set tabsize 4
 # but super-annoying when pasting code into nano v2.0.6, so default it off (Alt+I toggles it)
 unset autoindent
 
-# Default this off, so nano-smart-indent.sh can pass `--tabstospaces` as needed,
-# as nano has no command-line parameter to turn it off, if it's enabled here (Alt+Q toggles it)
+# Default to indenting with hard tabs -- needed for nano-smart-indent.sh to work correctly,
+# as it can pass `--tabstospaces` to nano to make it indent with spaces, but there's no inverse
+# option to make nano indent with tabs if it's configured here to use spaces
 #
-# NOTE: Enabling tabstospaces here breaks nano-smart-indent.sh's logic,
-# but to prefer spaces whenever detecting the indentation of existing files is inconclusive,
-# `export NANO_SMART_INDENT_PREFER_SPACES=true` in ~/.bashrc and/or ~/.zshrc
+# Toggle between indenting with tabs/spaces while nano is running with Alt+Q, and/or put this
+# in ~/.bashrc and/or ~/.zshrc to make nano-smart-indent.sh default to indenting with spaces:
+# export NANO_SMART_INDENT_PREFER_SPACES=true
 unset tabstospaces
 
 # Syntax highlighting
