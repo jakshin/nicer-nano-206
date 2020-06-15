@@ -1,3 +1,5 @@
+# Syntax definitions for general config files; doesn't provide any keyword highlighting,
+# but comment lines (beginning with a hash) are colored in comment gray
 syntax "conf" "\.conf$"
 
 # Comments
