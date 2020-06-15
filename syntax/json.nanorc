@@ -1,3 +1,4 @@
+# Syntax definitions for JSON
 syntax "json" "\.json$"
 
 # Keywords
