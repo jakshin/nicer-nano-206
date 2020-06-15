@@ -6,34 +6,47 @@ cd -- "$script_dir"
 source "../scripts/use-editorconfig.sh"
 
 function create-editorconfig-file() {
-  echo "root=true" > .editorconfig
-  echo "[*]" >> .editorconfig
+	echo "root=true" > .editorconfig
+	echo "[*]" >> .editorconfig
 
-  local line
-  for line in "$@"; do
-    echo "$line" >> .editorconfig
-  done
+	local line
+	for line in "$@"; do
+		echo "$line" >> .editorconfig
+	done
 }
 
 function run-test() {
-  local desc="$1" expected_style="$2" expected_size="$3"
+	local test_desc="$1" expected_style="$2" expected_size="$3"
 
-  [[ $first_test == false ]] && echo || first_test=false
-  echo -e "$desc"
+	[[ $first_test == false ]] && echo || first_test=false
+	echo -e "$test_desc"
 
-  use-editorconfig "a file.txt"
+	use-editorconfig "a file.txt"
 	[[ -n $_indent_style ]] || _indent_style="-"
 	[[ -n $_indent_size ]] || _indent_size="-"
 
-  local color
-  [[ "$_indent_style" == "$expected_style" ]] && color="32m" || color="1;31m"
-  _indent_style="\033[${color}${_indent_style}\033[0m"
-  [[ "$_indent_size" == "$expected_size" ]] && color="32m" || color="1;31m"
-  _indent_size="\033[${color}${_indent_size}\033[0m"
+	local color
+	[[ "$_indent_style" == "$expected_style" ]] && color="32m" || color="1;31m"
+	_indent_style="\033[${color}${_indent_style}\033[0m"
+	[[ "$_indent_size" == "$expected_size" ]] && color="32m" || color="1;31m"
+	_indent_size="\033[${color}${_indent_size}\033[0m"
 
-  echo -e "  indent style: $_indent_style"
-  echo -e "  indent size:  $_indent_size"
+	echo -e "  indent style: $_indent_style"
+	echo -e "  indent size:  $_indent_size"
 }
+
+function cleanup() {
+	if [[ $all_tests_ran != true ]]; then
+		echo -e "\n\033[1;31m--- Aborted, one or more tests didn't run ---"
+	fi
+
+	if [[ -n $tmp_dir ]]; then
+		cd
+		rm -rf "$tmp_dir"
+	fi
+}
+
+trap cleanup EXIT
 
 tmp_dir="$(mktemp -d)"
 mkdir "$tmp_dir/a directory"
@@ -67,6 +80,4 @@ run-test "indent_style=tab, tab_width is valid, indent_size is valid & different
 create-editorconfig-file "tab_width=8"
 run-test "indent_style isn't present, tab_width is valid" - 8
 
-cd
-rm -rf "$tmp_dir"
-echo "done"
+all_tests_ran=true
