@@ -1,3 +1,5 @@
+# Syntax definitions for nano's own config files (nanorc and syntax definitions);
+# this file provides syntax highlighting rules for itself :)
 syntax "nanorc" "[\.]*nanorc$"
 
 # Options
