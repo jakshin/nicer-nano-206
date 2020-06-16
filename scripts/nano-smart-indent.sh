@@ -120,10 +120,14 @@ if [[ -n $maybe_file ]]; then
 fi
 
 # Detect indentation, if needed
-# FIXME will the $0 instances below work with an alias, function, and symlink? PROBABLY NOT
 if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsize) ]]; then
+	self="$0"
+	while [[ -L $self ]]; do
+		self="$(readlink "$self")"
+	done
+
 	if [[ $NANO_SMART_INDENT_NO_EDITORCONFIG != true ]] && type -t editorconfig > /dev/null; then
-		type -t use-editorconfig > /dev/null || source "$(dirname -- "$0")/use-editorconfig.sh"
+		type -t use-editorconfig > /dev/null || source "$(dirname -- "$self")/use-editorconfig.sh"
 		use_editorconfig=true
 	fi
 
@@ -138,7 +142,7 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 			[[ $use_editorconfig == true ]] && use-editorconfig "$file"  # Sets $_indent_style/$_indent_size
 
 			if [[ (-z $tabstospaces && -z $_indent_style) || (-z $tabsize && -z $_indent_size) ]]; then
-				type -t detect-indent > /dev/null || source "$(dirname -- "$0")/detect-indent.sh"
+				type -t detect-indent > /dev/null || source "$(dirname -- "$self")/detect-indent.sh"
 				detect-indent "$file"  # Sets $_indent_style/$_indent_size
 			fi
 		fi
