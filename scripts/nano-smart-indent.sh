@@ -136,15 +136,14 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 	indent_size=""
 
 	for file in "${files[@]}"; do
+		[[ -n $file ]] || continue
+
 		_indent_style="" _indent_size=""  # Assigned in use-editorconfig/detect-indent
+		[[ $use_editorconfig == true ]] && use-editorconfig "$file"
 
-		if [[ -n $file ]]; then
-			[[ $use_editorconfig == true ]] && use-editorconfig "$file"  # Sets $_indent_style/$_indent_size
-
-			if [[ (-z $tabstospaces && -z $_indent_style) || (-z $tabsize && -z $_indent_size) ]]; then
-				type -t detect-indent > /dev/null || source "$(dirname -- "$self")/detect-indent.sh"
-				detect-indent "$file"  # Sets $_indent_style/$_indent_size
-			fi
+		if [[ (-z $tabstospaces && -z $_indent_style) || (-z $tabsize && -z $_indent_size) ]]; then
+			type -t detect-indent > /dev/null || source "$(dirname -- "$self")/detect-indent.sh"
+			detect-indent "$file"
 		fi
 
 		# if tabstospaces isn't set, and we detected an indent style:
@@ -174,7 +173,16 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 	done
 fi
 
-# FIXME Prompt if we've detected conflicting indentation styles (and input is a TTY)
+# Prompt if we've detected conflicting indentation styles (and input is a TTY)
+if [[ $indent_conflict == true ]]; then
+	if [[ $NANO_SMART_INDENT_TESTING_CONFLICTS == true ]]; then
+		echo "conflict-prompt"
+	else
+		: # FIXME
+	fi
+elif [[ $NANO_SMART_INDENT_TESTING_CONFLICTS == true ]]; then
+	echo "-"
+fi
 
 # Run nano
 if [[ -z $tabstospaces &&
@@ -188,12 +196,13 @@ if [[ -z $tabsize && -n $indent_size ]]; then
 	nano_args+="--tabsize=$indent_size"
 fi
 
-if [[ $NANO_SMART_INDENT_TESTING == true ]]; then
-	#[[ ${#files[@]} == 0 ]] && files_str="(none)" || files_str="${files[*]}"
+if [[ $NANO_SMART_INDENT_TESTING_CMD_LINE == true ]]; then
 	echo "file names:    ${files[*]:--}"
 	echo "will edit:     $will_edit"
 	echo "\$tabstospaces: ${tabstospaces:--}"
 	echo "\$tabsize:      ${tabsize:--}"
+	cmd="echo"
+elif [[ $NANO_SMART_INDENT_TESTING_CONFLICTS == true ]]; then
 	cmd="echo"
 else
 	cmd="exec"

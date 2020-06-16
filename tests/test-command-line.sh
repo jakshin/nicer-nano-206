@@ -1,10 +1,10 @@
 #!/bin/bash -e
-# Tests the nano-smart-indent.sh script's command-line parsing.
+# Tests the nano-smart-indent.sh script's command-line handling.
 
 script_dir="$(dirname -- "$0")"
 cd -- "$script_dir"
 
-export NANO_SMART_INDENT_TESTING=true
+export NANO_SMART_INDENT_TESTING_CMD_LINE=true
 errors=0
 output=""  # Set in run-test, read in check-output
 
