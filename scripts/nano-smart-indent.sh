@@ -5,6 +5,10 @@
 # options to nano to adjust its indentation behavior as needed. The most convenient way to use
 # it is through an alias: alias nano=/path/to/nano-smart-indent.sh
 #
+# FIXME ^ but an alias won't work when other programs launch nano, e.g. git
+# so maybe either also set $EDITOR / $VISUAL if they mention nano,
+# or use a symlink in /usr/local/bin instead (refusing to replace anything already there)
+#
 # It first tries to use EditorConfig settings, as reported by the editorconfig CLI. This works
 # on both existing and new files, since finding a relevant .editorconfig file only depends on
 # the edited file's path. If the editorconfig CLI isn't installed, this step is skipped; if it
@@ -34,11 +38,14 @@
 # The --tabsize (or -T) option is also passed through, setting the tab display width when
 # indenting with tabs, or the number of spaces to use when indenting with spaces. If you don't
 # pass it, either the relevant EditorConfig setting or the existing indentation width in the file
-# will be used, or - if neither of those are applicable/available - the `tabsize` setting from
+# will be used, or -- if neither of those are applicable/available -- the `tabsize` setting from
 # nano's config files, or its compiled-in default of 8.
 #
 # Copyright (c) 2020 Jason Jackson. MIT License.
 #
+
+# FIXME you can actually pass just the first unique substring of a long option to nano,
+# e.g. "--tabsto", --tabsi=2
 
 # Parse the command line like nano v2.0.6 will
 # (Just enough to understand which file(s) will be edited, and a few relevant options)
@@ -54,13 +61,12 @@ for arg; do
 	# Remove options which aren't real nano options from the command line we'll pass to nano
 	# https://unix.stackexchange.com/questions/258512/how-to-remove-a-positional-parameter-from
 	shift
-	[[ $arg == "--tabs" ]] || set -- "$@" "$arg"
+	[[ $arg == "--tabs" && $options_ended == false ]] || set -- "$@" "$arg"
 
 	# Process the argument
 	if [[ $tabsize_value_needed == true ]]; then
 		tabsize_value_needed=false
 		tabsize="$arg"
-		continue
 
 	elif [[ $arg == "--" && $options_ended == false ]]; then
 		# This can come between a '+n,n' argument and a file name, with no effect
@@ -68,7 +74,6 @@ for arg; do
 
 	elif [[ ($arg == "--help" || $arg == "--version") && $options_ended == false ]]; then
 		will_edit=false
-		break
 
 	elif [[ $arg == "--tabsize"* && $options_ended == false ]]; then
 		# If an equal sign is present, the rest of the arg is tab size, else the next arg is
@@ -89,14 +94,12 @@ for arg; do
 			arg="${arg//T*/}"
 		fi
 
-		# '?', 'h' and 'V' can be bundled with other short options
-		if [[ $arg == *"?"* || $arg == *h* || $arg == *V* ]]; then
-			will_edit=false
-			break
-		fi
+		[[ $arg == *E* ]] && tabstospaces=true
+		[[ $arg == *"?"* || $arg == *h* || $arg == *V* ]] && will_edit=false
 
 	elif [[ $arg == +* ]]; then
-		# FIXME what happens if the whole argument is just "+"? or "+foo", without a number?
+		# Nano appears to handle all arguments which begin with "+" the same, even just "+",
+		# and things that are clearly invalid as row/column notation, like "+xyz"
 		if [[ -n $maybe_file ]]; then
 			maybe_file=""
 			files+=("$arg")
@@ -117,8 +120,10 @@ if [[ -n $maybe_file ]]; then
 fi
 
 # Detect indentation, if needed
+# FIXME will the $0 instances below work with an alias, function, and symlink? PROBABLY NOT
 if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsize) ]]; then
 	if [[ $NANO_SMART_INDENT_NO_EDITORCONFIG != true ]] && type -t editorconfig > /dev/null; then
+		type -t use-editorconfig > /dev/null || source "$(dirname -- "$0")/use-editorconfig.sh"
 		use_editorconfig=true
 	fi
 
@@ -133,7 +138,7 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 			[[ $use_editorconfig == true ]] && use-editorconfig "$file"  # Sets $_indent_style/$_indent_size
 
 			if [[ (-z $tabstospaces && -z $_indent_style) || (-z $tabsize && -z $_indent_size) ]]; then
-				type -d detect-indent > /dev/null || source "$(dirname -- "$0")/detect-indent.sh"
+				type -t detect-indent > /dev/null || source "$(dirname -- "$0")/detect-indent.sh"
 				detect-indent "$file"  # Sets $_indent_style/$_indent_size
 			fi
 		fi
@@ -165,12 +170,9 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 	done
 fi
 
-# FIXME Prompt if we've detected conflicting indentation styles
+# FIXME Prompt if we've detected conflicting indentation styles (and input is a TTY)
 
 # Run nano
-[[ $NANO_SMART_INDENT_TESTING == true ]] && cmd="echo" || cmd="exec"
-cmd="echo" # FIXME testing
-
 if [[ -z $tabstospaces &&
 	($indent_style == "space" || ($indent_style == "" && $NANO_SMART_INDENT_PREFER_SPACES == true)) ]]
 then
@@ -180,6 +182,18 @@ fi
 if [[ -z $tabsize && -n $indent_size ]]; then
 	[[ -z $nano_args ]] || nano_args+=" "
 	nano_args+="--tabsize=$indent_size"
+fi
+
+if [[ $NANO_SMART_INDENT_TESTING == true ]]; then
+	#[[ ${#files[@]} == 0 ]] && files_str="(none)" || files_str="${files[*]}"
+	echo "file names:    ${files[*]:--}"
+	echo "will edit:     $will_edit"
+	echo "\$tabstospaces: ${tabstospaces:--}"
+	echo "\$tabsize:      ${tabsize:--}"
+	cmd="echo"
+else
+	cmd="exec"
+	cmd="echo" # FIXME testing
 fi
 
 $cmd /usr/bin/nano $nano_args "$@"
