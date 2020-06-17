@@ -1,7 +1,6 @@
 #
-# Detects the given file's predominant indentation.
-# Set $_indent_style to "tab", "space", or an empty string if anything goes sideways.
-# If the file appears to favor space indentation, it'll also set $_indent_size to a number
+# Detects the given file's predominant indentation, and sets $_indent_style to "tab" or "space".
+# If the file appears to favor indentation with spaces, it'll also set $_indent_size to a number
 # representing the dominant indentation size. 
 #
 # This only works on ASCII and UTF-8 text, and has only been tested on macOS's bash v3.2.57.
@@ -14,10 +13,6 @@
 
 function detect-indent() {
 	local file_path="$1"
-
-	export _indent_style=""  # Return value, "tab" or "space"
-	export _indent_size=""   # Return value, number of spaces (iff _indent_style is "space")
-
 	[[ -r $file_path && -f $file_path ]] || return 0
 
 	local spaced_count=0 tabbed_count=0  # Counts of lines indented with spaces/tabs
