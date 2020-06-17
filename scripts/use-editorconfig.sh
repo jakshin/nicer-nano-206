@@ -7,10 +7,6 @@
 
 function use-editorconfig() {
 	local file_path="$1"
-
-	export _indent_style=""  # Return value, "tab" or "space"
-	export _indent_size=""   # Return value, number of spaces
-
 	[[ -r $file_path && -f $file_path ]] || return 0
 
 	if [[ $file_path != /* ]]; then
