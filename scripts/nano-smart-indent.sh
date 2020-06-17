@@ -185,13 +185,18 @@ if [[ $indent_conflict == true ]]; then
 		blanket_indent="spaces"
 	fi
 
-	echo "Conflicting indentation settings were detected across different files."
+	if [[ -t 0 && -t 1 ]]; then
+		terminal=true  # We'll prompt if stdin/stdout are connected to a terminal
+		bright='\033[1m'
+		normal='\033[0m'
+	fi
+
+	echo -e "${bright}Conflicting indentation settings were detected across different files.${normal}"
 	echo "Nano uses the same indentation settings for all files loaded in a session,"
 	echo "so it will indent newly-added lines with $blanket_indent in all of them."
 
-	# Prompt if stdin/stdout are connected to a terminal
-	if [[ -t 0 && -t 1 ]]; then
-		echo -en "Continue [y|n]? "
+	if [[ $terminal == true ]]; then
+		echo -en "${bright}Continue [y|n]? ${normal}"
 		read -rn 1
 		echo
 		[[ $REPLY == "Y" || $REPLY == "y" ]] || exit 0
@@ -220,7 +225,6 @@ elif [[ $NANO_SMART_INDENT_TESTING_CONFLICTS == true ]]; then
 	cmd="echo"
 else
 	cmd="exec"
-	cmd="echo" # FIXME testing
 fi
 
 $cmd /usr/bin/nano $nano_args "$@"
