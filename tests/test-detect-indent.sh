@@ -8,6 +8,7 @@ source "../scripts/detect-indent.sh"
 function run-test() {
   local fixture_file="$1" expected_style="$2" expected_size="$3"
 
+	_indent_style="" _indent_size=""
 	detect-indent "$fixture_file"
 	[[ -n $_indent_style ]] || _indent_style="-"
 	[[ -z $_indent_size ]] || _indent_size="($_indent_size)"
