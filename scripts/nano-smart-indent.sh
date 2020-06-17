@@ -165,7 +165,9 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 		if [[ -z $tabsize && -n $_indent_size ]]; then
 			if [[ -z $indent_size ]]; then
 				indent_size="$_indent_size"
-			elif [[ "$indent_size" != "$_indent_size" && "$indent_style" == "space" ]]; then
+			elif [[ "$indent_size" != "$_indent_size" &&
+				($tabstospaces == true || "$indent_style" == "space") ]]
+			then
 				indent_conflict=true
 				break
 			fi
@@ -173,15 +175,27 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 	done
 fi
 
-# Prompt if we've detected conflicting indentation styles (and input is a TTY)
+# Speak up if we've detected conflicting indentation styles
 if [[ $indent_conflict == true ]]; then
-	if [[ $NANO_SMART_INDENT_TESTING_CONFLICTS == true ]]; then
-		echo "conflict-prompt"
+	if [[ $indent_style == "tab" ]]; then
+		blanket_indent="tabs"
+	elif [[ -n $tabsize || -n $indent_size ]]; then
+		blanket_indent="${tabsize:-$indent_size} spaces"
 	else
-		: # FIXME
+		blanket_indent="spaces"
 	fi
-elif [[ $NANO_SMART_INDENT_TESTING_CONFLICTS == true ]]; then
-	echo "-"
+
+	echo "Conflicting indentation settings were detected across different files."
+	echo "Nano uses the same indentation settings for all files loaded in a session,"
+	echo "so it will indent newly-added lines with $blanket_indent in all of them."
+
+	# Prompt if stdin/stdout are connected to a terminal
+	if [[ -t 0 && -t 1 ]]; then
+		echo -en "Continue [y|n]? "
+		read -rn 1
+		echo
+		[[ $REPLY == "Y" || $REPLY == "y" ]] || exit 0
+	fi
 fi
 
 # Run nano
