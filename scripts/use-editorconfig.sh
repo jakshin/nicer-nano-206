@@ -17,16 +17,17 @@ function use-editorconfig() {
 		[[ $PWD == "/" ]] && file_path="/$file_path" || file_path="$PWD/$file_path"
 	fi
 
-	local line
+	local line indent_style="" indent_size="" tab_width=""
+
 	while IFS="" read -r line; do
 		line="${line//[$'\t ']/}"
 
 		if [[ $line == "indent_style="* ]]; then
-			local indent_style="${line//*=/}"
+			indent_style="${line//*=/}"
 		elif [[ $line == "indent_size="* ]]; then
-			local indent_size="${line//*=/}"
+			indent_size="${line//*=/}"
 		elif [[ $line == "tab_width="* ]]; then
-			local tab_width="${line//*=/}"
+			tab_width="${line//*=/}"
 		fi
 	done < <( editorconfig "$file_path" 2> /dev/null )
 
