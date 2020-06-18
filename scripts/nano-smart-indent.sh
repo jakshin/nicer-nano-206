@@ -1,13 +1,8 @@
 #!/bin/bash
 #
-# This is a wrapper script for nano, which passes its arguments to nano, after first trying to
-# figure out the best indentation settings for the file(s) being edited, and passing additional
-# options to nano to adjust its indentation behavior as needed. The most convenient way to use
-# it is through an alias: alias nano=/path/to/nano-smart-indent.sh
-#
-# FIXME ^ but an alias won't work when other programs launch nano, e.g. git
-# so maybe either also set $EDITOR / $VISUAL if they mention nano,
-# or use a symlink in /usr/local/bin instead (refusing to replace anything already there)
+# This is a wrapper script for nano, which passes its arguments through to nano -- after
+# first trying to figure out the best indentation settings for the file(s) being edited, and
+# adding more options to nano's command line, if needed, to adjust its indentation behavior.
 #
 # It first tries to use EditorConfig settings, as reported by the editorconfig CLI. This works
 # on both existing and new files, since finding a relevant .editorconfig file only depends on
@@ -44,9 +39,6 @@
 # Copyright (c) 2020 Jason Jackson. MIT License.
 #
 
-# FIXME you can actually pass just the first unique substring of a long option to nano,
-# e.g. "--tabsto", --tabsi=2
-
 # Parse the command line like nano v2.0.6 will
 # (Just enough to understand which file(s) will be edited, and a few relevant options)
 declare -a files
@@ -67,46 +59,69 @@ for arg; do
 	if [[ $tabsize_value_needed == true ]]; then
 		tabsize_value_needed=false
 		tabsize="$arg"
+		continue
+	fi
 
-	elif [[ $arg == "--" && $options_ended == false ]]; then
-		# This can come between a '+n,n' argument and a file name, with no effect
-		options_ended=true
+	if [[ $options_ended == false && $arg == -* && $arg != - ]]; then
+		if [[ $arg == "--" ]]; then
+			# This can come between a '+n,n' argument and a file name, with no effect
+			options_ended=true
 
-	elif [[ ($arg == "--help" || $arg == "--version") && $options_ended == false ]]; then
-		will_edit=false
+		elif [[ "--help" == "$arg"* || "--version" == "$arg"* ]]; then
+			will_edit=false  # Nano will error on --h or --v; --he or longer and --ve or longer work
 
-	elif [[ $arg == "--tabsize"* && $options_ended == false ]]; then
-		# If an equal sign is present, the rest of the arg is tab size, else the next arg is
-		[[ $arg == "--tabsize="* ]] && tabsize="${arg#--tabsize=}" || tabsize_value_needed=true
+		elif [[ $arg == "--tabsize" || $arg == "--tabsiz" || $arg == "--tabsi" ||
+			$arg == "--tabsize="* || $arg == "--tabsiz="* || $arg == "--tabsi="* ]]
+		then
+			# If an equal sign is present, the rest of the arg is tab size, else the next arg is
+			[[ $arg == *=* ]] && tabsize="${arg//*=/}" || tabsize_value_needed=true
 
-	elif [[ $arg == "--tabstospaces" && $options_ended == false ]]; then
-		tabstospaces=true
+		elif [[ "--tabstospaces" == "$arg"* && "$arg" == "--tabst"* ]]; then
+			tabstospaces=true
 
-	elif [[ $arg == "--tabs" && $options_ended == false ]]; then
-		# This isn't a real nano option; it means the inverse of '--tabstospaces',
-		# i.e. requests to use tabs for indentation regardless of the file content
-		[[ $tabstospaces == true ]] || tabstospaces=false
+		elif [[ $arg == "--tabs" ]]; then
+			# This isn't a real nano option; it means the inverse of '--tabstospaces',
+			# i.e. requests to use tabs for indentation regardless of EditorConfig / file content
+			[[ $tabstospaces == true ]] || tabstospaces=false
 
-	elif [[ $arg == -* && $options_ended == false ]]; then
-		if [[ $arg == *T* ]]; then
-			# If characters follow a T option, the rest of the arg is tab size, else the next arg is
-			[[ $arg == *T ]] && tabsize_value_needed=true || tabsize="${arg//*T/}"
-			arg="${arg//T*/}"
+		elif [[ $arg == --* ]]; then
+			continue  # A long option we don't care about
+
+		else  # Begins with a single dash, must be one or more short option(s)
+			last_index=$(( ${#arg} - 1 ))
+
+			for (( i=1; i <= last_index; i++ )); do
+				ch=${arg:$i:1}
+
+				if [[ $ch == "?" || $ch == "h" || $ch == "V" ]];
+					then will_edit=false
+				elif [[ $ch == "E" ]]; then
+					tabstospaces=true
+				elif [[ $ch == "T" ]]; then
+					# If characters follow a T option, the rest of the arg is tab size, else the next arg is
+					if (( i < last_index )); then
+						tabsize="${arg:$i+1}"
+					else
+						tabsize_value_needed=true
+					fi
+				elif [[ "CQYors" == *$ch* ]]; then
+					continue  # The rest of this argument, if any, is optarg
+				fi
+			done
 		fi
 
-		[[ $arg == *E* ]] && tabstospaces=true
-		[[ $arg == *"?"* || $arg == *h* || $arg == *V* ]] && will_edit=false
+		continue
+	fi
 
-	elif [[ $arg == +* ]]; then
-		# Nano appears to handle all arguments which begin with "+" the same, even just "+",
-		# and things that are clearly invalid as row/column notation, like "+xyz"
+	if [[ $arg == +* ]]; then
+		# Nano appears to handle all arguments which begin with "+" the same way,
+		# including plain "+", and things that are invalid as row/column notation like "+xyz"
 		if [[ -n $maybe_file ]]; then
 			maybe_file=""
 			files+=("$arg")
 		else
 			maybe_file="$arg"
 		fi
-
 	else
 		# This is either an ordinary argument,
 		# or one that looks like an option but "--" was previously passed

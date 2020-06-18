@@ -63,12 +63,19 @@ if [[ $output != *"--tabs"* ]]; then
 	(( errors++ ))
 fi
 
+# Tab size can be specified in a single argument
+run-test -T3
+check-output "" true - 3
+
+run-test --tabsize=5 "foo.txt"
+check-output "foo.txt" true - 5
+
+run-test "foo.txt" --tabsi=6
+check-output "foo.txt" true - 6
+
 # These should all result in us using the second argument as $tabsize 
 run-test -T 2
 check-output "" true - 2
-
-run-test -T3
-check-output "" true - 3
 
 run-test -T -- 2 foo.txt      # Nano takes the "--" as the tab size
 check-output "2 foo.txt" true - --
@@ -96,11 +103,17 @@ check-output "foo.txt" false - 2
 run-test --tabsize=4 --help
 check-output "" false - 4
 
+run-test --he
+check-output "" false - -
+
 run-test -AV foo.txt
 check-output "foo.txt" false - -
 
 run-test foo.txt --version bar.txt
 check-output "foo.txt bar.txt" false - -
+
+run-test --ver
+check-output "" false - -
 
 run-test "-?"
 check-output "" false - -
@@ -108,6 +121,15 @@ check-output "" false - -
 # Tabs/spaces options
 run-test "foo.txt" --tabstospaces
 check-output "foo.txt" true true -
+
+run-test "foo.txt" --tabst
+check-output "foo.txt" true true -
+
+run-test "foo.txt" --tabstosp
+check-output "foo.txt" true true -
+
+run-test "foo.txt" --tabstox  # Nano will toss an "unrecognized option" error
+check-output "foo.txt" true - -
 
 run-test -AET 2 "foo.txt"
 check-output "foo.txt" true true 2
@@ -137,6 +159,10 @@ check-output "foo.txt" true - 2
 
 run-test +2,2 -- "--help"
 check-output "--help" true - -
+
+# The argument "-" is a file name, not an option
+run-test -
+check-output "-" true - -
 
 # Passing an empty file name to nano is valid, and results in an unnamed new buffer
 run-test "foo.txt" "" "bar.txt"
