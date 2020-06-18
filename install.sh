@@ -1,10 +1,16 @@
 #!/bin/bash -e
-# Installs nicer settings for macOS's nano, by creating links at ~/.nanorc and ~/.nano-syntax.
+# Installs nicer settings for macOS's nano, by creating various symlinks.
 # This is only intended for use on macOS with GNU nano v2.0.6.
 
-# FIXME implement
-# install.sh -> create symlinks with replacement detection,
-# offer to add aliases to ~/.bashrc and/or ~/.zshrc if they're not already there
+# FIXME install.sh -> create ~/.nanorc and ~/.nano-syntax symlinks,
+# detecting existing files/symlinks
+
+# FIXME also bash & zsh completions
+
+# FIXME also an alias for nano-smart-indent.sh...
+# but an alias won't work when other programs launch nano, e.g. git,
+# so maybe either also set $EDITOR / $VISUAL if they mention nano,
+# or use a symlink in /usr/local/bin instead (refusing to replace anything already there)
 
 # # Initialize
 # cd -- "$(dirname -- "$0")"  # Run from this script's directory
