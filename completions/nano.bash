@@ -1,5 +1,5 @@
 # Bash completions for nano v2.0.6
-# (Also for nano-smart-indent.sh's '--tabs' option)
+# (Also for nano206++.sh's '--tabs' option)
 
 function _nano() {
 	local i
@@ -19,12 +19,12 @@ function _nano() {
 								--version --view --wordbounds -A -B -c -C -d -D -E -F -h -H -i -I -k -K -l -L
 								-m -n -N -o -O -p -Q -r -R -s -S -t -T -U -v -V -w -W -x -Y -z'
 
-		# If "nano" is actually nano-smart-indent.sh, via alias/function/symlink, add a "--tabs" option
-		if [[ "$(type nano)" == *"nano-smart-indent"* ]]; then
+		# If "nano" is actually nano206++.sh, via alias/function/symlink, add a "--tabs" option
+		if [[ "$(type nano)" == *"nano206++"* ]]; then
 			opts+=' --tabs'
 		else
 			local nano_cmd="$(type -p nano)"
-			if [[ -L $nano_cmd && "$(readlink "$nano_cmd")" == *"nano-smart-indent.sh"* ]]; then
+			if [[ -L $nano_cmd && "$(readlink "$nano_cmd")" == *"nano206++.sh"* ]]; then
 				opts+=' --tabs'
 			fi
 		fi

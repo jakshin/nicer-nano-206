@@ -1,10 +1,10 @@
 #compdef nano
 # Zsh completions for GNU nano v2.0.6
-# (Also for nano-smart-indent.sh's '--tabs' option)
+# (Also for nano206++.sh's '--tabs' option)
 
 local whence_nano="$(whence -c nano)"
-if [[ $whence_nano == *"nano-smart-indent"* ||
-	(-L $whence_nano && "$(readlink "$whence_nano")" == *"nano-smart-indent.sh"*) ]]
+if [[ $whence_nano == *"nano206++"* ||
+	(-L $whence_nano && "$(readlink "$whence_nano")" == *"nano206++.sh"*) ]]
 then
 	local nano_smart_indent_opts='--tabs[Tabs are the one true indentation character]'
 else

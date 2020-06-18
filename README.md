@@ -19,17 +19,11 @@ To **uninstall** (i.e. remove the symlinks at `~/.nanorc` and `~/.nano-syntax`, 
 
 ## Using the nano wrapper script
 
-The `nano-smart-indent.sh` script is a wrapper for nano, which passes its arguments to nano, after first trying to figure out the best indentation settings for the file(s) being edited, and passing additional options to nano to adjust its indentation behavior as needed.
+The `nano206++.sh` file is a wrapper script, which passes its arguments to the real nano, after first trying to figure out the best indentation settings for the file(s) being edited, and adjusting nano's command line to tailor its indentation behavior to the situation at hand. It's intended to be symlinked as `/usr/local/bin/nano` so that when you invoke "nano", it runs instead of the real nano.
 
-It first tries to use [EditorConfig](https://editorconfig.org) settings, as reported by the `editorconfig` CLI. This works on both existing and new files, since finding a relevant `.editorconfig` file only depends on the edited file's path. If the editorconfig CLI isn't installed, this step is skipped; if it is installed but you don't want this script to use it, you can put this line in your `~/.bashrc` and/or `~/.zshrc`: `export NANO_SMART_INDENT_NO_EDITORCONFIG=true`
+It first tries to use [EditorConfig](https://editorconfig.org) settings, as reported by the `editorconfig` CLI. This works on both existing and new files, since finding a relevant `.editorconfig` file only depends on the edited file's path. If the editorconfig CLI isn't installed, or no applicable `.editorconfig` is found, the script falls back to reading the file(s) being edited, and attempting to detect the indentation style already in use in the file; of course, that only works on files that already exist.
 
-If EditorConfig settings aren't found (or aren't used), the script next tries to read up to 20 KB from the file, and detect its indentation style. This, of course, only works on files that already exist.
-
-For all of this to work, neither `/etc/nanorc` nor `~/.nanorc` can contain `set tabstospaces`; that's because nano doesn't provide a command-line option which tells it to use tabs for indentation, so if you've told it to use spaces for indentation in one of its config files, this script has no way to change that setting. And _that_, in turn, means that if this script can't detect a file's indentation style, nano's default setting of using tabs for indentation will come into play. If you're more a spaces-for-indentation kind of person, put this into your `~/.bashrc` and/or `~/.zshrc` to tell this script to default to having nano indent with spaces when it can't figure out what else to do: `export NANO_SMART_INDENT_PREFER_SPACES=true`
-
-You can always pass `--tabstospaces` (or `-E`) if you want to indent a given file with spaces, and this script will dutifully pass that setting along to nano, regardless of what EditorConfig thinks or the indention style of any contents already in the file. You can also pass `--tabs`, which isn't an actual nano option, but which this script takes as the opposite of `--tabstospaces`, and which will make it _not_ tell nano to indent with spaces, regardless of EditorConfig's opinion, or an existing file's contents. If you pass both `--tabstospaces` and `--tabs`, `--tabstospaces` always wins, regardless of order.
-
-The `--tabsize` (or `-T`) option is also passed through, setting the tab display width when indenting with tabs, or the number of spaces to use when indenting with spaces. If you don't pass it, either the relevant EditorConfig setting or the existing indentation width in the file will be used, or -- if neither of those are applicable/available -- the `tabsize` setting from nano's config file (4 in this repo's `nanorc`).
+Take a look at the extensive comments at the top of [nano206++.sh](./scripts/nano206++.sh) for details, including ways to customize the script's behavior.
 
 
 ## Compatibility

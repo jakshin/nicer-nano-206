@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# This is a wrapper script for nano, which passes its arguments through to nano -- after
-# first trying to figure out the best indentation settings for the file(s) being edited, and
-# adding more options to nano's command line, if needed, to adjust its indentation behavior.
+# This is a wrapper script for nano v2.0.6, which passes its arguments through to the real nano,
+# after first trying to figure out the best indentation settings for the file(s) being edited,
+# and adding more options to nano's command line, if needed, to adjust its indentation behavior.
 #
 # It first tries to use EditorConfig settings, as reported by the editorconfig CLI. This works
 # on both existing and new files, since finding a relevant .editorconfig file only depends on
