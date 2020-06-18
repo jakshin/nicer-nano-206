@@ -6,9 +6,9 @@ local whence_nano="$(whence -c nano)"
 if [[ $whence_nano == *"nano206++"* ||
 	(-L $whence_nano && "$(readlink "$whence_nano")" == *"nano206++.sh"*) ]]
 then
-	local nano_smart_indent_opts='--tabs[Tabs are the one true indentation character]'
+	local nicer_nano_opts='--tabs[Tabs are the one true indentation character]'
 else
-	unset nano_smart_indent_opts
+	unset nicer_nano_opts
 fi
 
 _arguments -s -S : \
@@ -49,5 +49,5 @@ _arguments -s -S : \
 	{-w,--nowrap}'[Do not hard-wrap long lines]' \
 	{-x,--nohelp}'[Do not show the two help lines]' \
 	{-z,--suspend}'[Enable suspension with ^Z]' \
-	$nano_smart_indent_opts \
+	$nicer_nano_opts \
 	"*:file:_files"

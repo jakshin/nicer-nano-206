@@ -4,7 +4,7 @@
 script_dir="$(dirname -- "$0")"
 cd -- "$script_dir"
 
-export NANO_SMART_INDENT_TESTING_CMD_LINE=true
+export NICER_NANO_TESTING_CMD_LINE=true
 errors=0
 output=""  # Set in run-test, read in check-output
 
@@ -187,16 +187,16 @@ function use-editorconfig() { files+=("use-editorconfig"); _indent_style=tab; _i
 run-test "dummy.txt"
 check-output "dummy.txt use-editorconfig" true - -
 
-export NANO_SMART_INDENT_NO_EDITORCONFIG=true
+export NICER_NANO_NO_EDITORCONFIG=true
 
 run-test "dummy.txt"
 check-output "dummy.txt detect-indent" true - -
 
 unset -f use-editorconfig detect-indent
-unset NANO_SMART_INDENT_NO_EDITORCONFIG
+unset NICER_NANO_NO_EDITORCONFIG
 
-# Use $NANO_SMART_INDENT_PREFER_SPACES
-export NANO_SMART_INDENT_PREFER_SPACES=true
+# Use $NICER_NANO_PREFER_SPACES
+export NICER_NANO_PREFER_SPACES=true
 
 run-test "foo.txt"
 check-output "foo.txt" true - -
@@ -226,7 +226,7 @@ if [[ $output == *"--tabstospaces"* ]]; then
 	(( errors++ ))
 fi
 
-unset NANO_SMART_INDENT_PREFER_SPACES
+unset NICER_NANO_PREFER_SPACES
 
 # Summarize
 if (( errors > 1 )); then

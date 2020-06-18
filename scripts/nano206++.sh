@@ -8,7 +8,7 @@
 # on both existing and new files, since finding a relevant .editorconfig file only depends on
 # the edited file's path. If the editorconfig CLI isn't installed, this step is skipped; if it
 # is installed but you don't want this script to use it, put this in your .bashrc and/or .zshrc:
-# export NANO_SMART_INDENT_NO_EDITORCONFIG=true
+# export NICER_NANO_NO_EDITORCONFIG=true
 #
 # If EditorConfig settings aren't found (or aren't used), the script next tries to read up to
 # 20 KB from the file, and detect its indentation style. This, of course, only works on files
@@ -21,7 +21,7 @@
 # can't detect a file's indentation style, nano's default setting of using tabs for indentation
 # will come into play. If you're more a spaces-for-indentation kind of person, put this into
 # your .bashrc and/or .zshrc to tell this script to default to having nano indent with spaces
-# when it can't figure out what else to do: export NANO_SMART_INDENT_PREFER_SPACES=true
+# when it can't figure out what else to do: export NICER_NANO_PREFER_SPACES=true
 #
 # You can always pass --tabstospaces (or -E) if you want to indent a given file with spaces,
 # and this script will dutifully pass that setting along to nano, regardless of what EditorConfig
@@ -141,7 +141,7 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 		self="$(readlink "$self")"
 	done
 
-	if [[ $NANO_SMART_INDENT_NO_EDITORCONFIG != true ]] && type -t editorconfig > /dev/null; then
+	if [[ $NICER_NANO_NO_EDITORCONFIG != true ]] && type -t editorconfig > /dev/null; then
 		type -t use-editorconfig > /dev/null || source "$(dirname -- "$self")/functions/use-editorconfig.sh"
 		use_editorconfig=true
 	fi
@@ -220,7 +220,7 @@ fi
 
 # Run nano
 if [[ -z $tabstospaces &&
-	($indent_style == "space" || ($indent_style == "" && $NANO_SMART_INDENT_PREFER_SPACES == true)) ]]
+	($indent_style == "space" || ($indent_style == "" && $NICER_NANO_PREFER_SPACES == true)) ]]
 then
 	nano_args="--tabstospaces"
 fi
@@ -230,13 +230,13 @@ if [[ -z $tabsize && -n $indent_size ]]; then
 	nano_args+="--tabsize=$indent_size"
 fi
 
-if [[ $NANO_SMART_INDENT_TESTING_CMD_LINE == true ]]; then
+if [[ $NICER_NANO_TESTING_CMD_LINE == true ]]; then
 	echo "file names:    ${files[*]:--}"
 	echo "will edit:     $will_edit"
 	echo "\$tabstospaces: ${tabstospaces:--}"
 	echo "\$tabsize:      ${tabsize:--}"
 	cmd="echo"
-elif [[ $NANO_SMART_INDENT_TESTING_CONFLICTS == true ]]; then
+elif [[ $NICER_NANO_TESTING_CONFLICTS == true ]]; then
 	cmd="echo"
 else
 	cmd="exec"

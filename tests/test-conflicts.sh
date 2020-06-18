@@ -4,7 +4,7 @@
 script_dir="$(dirname -- "$0")"
 cd -- "$script_dir"
 
-export NANO_SMART_INDENT_TESTING_CONFLICTS=true
+export NICER_NANO_TESTING_CONFLICTS=true
 errors=0
 output=""	# Set in run-test, read in check-output
 
