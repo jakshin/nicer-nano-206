@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Tests the nano-smart-indent.sh script's command-line handling.
+# Tests the nano206++.sh script's command-line handling.
 
 script_dir="$(dirname -- "$0")"
 cd -- "$script_dir"
@@ -19,7 +19,7 @@ function run-test() {
 	echo -n "Incoming arguments: "
 	[[ $# == 0 ]] && echo -e "${dim_color}none${no_color}" || echo "$@"
 
-	output="$("$script_dir/../scripts/nano-smart-indent.sh" "$@" 2>&1)"
+	output="$("$script_dir/../scripts/nano206++.sh" "$@" 2>&1)"
 }
 
 function check-output() {
