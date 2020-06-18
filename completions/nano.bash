@@ -1,5 +1,5 @@
-# Bash completions for nano v2.0.6
-# (Also for nano206++.sh's '--tabs' option)
+# Bash completions for nano v2.0.6 (including nano206++.sh's '--tabs' option)
+# Use this by sourcing it in ~/.bashrc
 
 function _nano() {
 	local i

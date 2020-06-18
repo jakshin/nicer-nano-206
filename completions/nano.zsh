@@ -1,6 +1,6 @@
 #compdef nano
-# Zsh completions for GNU nano v2.0.6
-# (Also for nano206++.sh's '--tabs' option)
+# Zsh completions for GNU nano v2.0.6 (including nano206++.sh's '--tabs' option)
+# Use this by symlinking it as "_nano", anywhere in $fpath
 
 local whence_nano="$(whence -c nano)"
 if [[ $whence_nano == *"nano206++"* ||
