@@ -3,7 +3,7 @@
 
 script_dir="$(dirname -- "$0")"
 cd -- "$script_dir"
-source "../scripts/use-editorconfig.sh"
+source "../scripts/functions/use-editorconfig.sh"
 
 function create-editorconfig-file() {
 	echo "root=true" > .editorconfig

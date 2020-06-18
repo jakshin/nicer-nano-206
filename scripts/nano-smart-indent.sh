@@ -142,7 +142,7 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 	done
 
 	if [[ $NANO_SMART_INDENT_NO_EDITORCONFIG != true ]] && type -t editorconfig > /dev/null; then
-		type -t use-editorconfig > /dev/null || source "$(dirname -- "$self")/use-editorconfig.sh"
+		type -t use-editorconfig > /dev/null || source "$(dirname -- "$self")/functions/use-editorconfig.sh"
 		use_editorconfig=true
 	fi
 
@@ -157,7 +157,7 @@ if [[ $will_edit == true && ${#files[@]} != 0 && (-z $tabstospaces || -z $tabsiz
 		[[ $use_editorconfig == true ]] && use-editorconfig "$file"
 
 		if [[ (-z $tabstospaces && -z $_indent_style) || (-z $tabsize && -z $_indent_size) ]]; then
-			type -t detect-indent > /dev/null || source "$(dirname -- "$self")/detect-indent.sh"
+			type -t detect-indent > /dev/null || source "$(dirname -- "$self")/functions/detect-indent.sh"
 			detect-indent "$file"
 		fi
 

@@ -3,7 +3,7 @@
 
 script_dir="$(dirname -- "$0")"
 cd -- "$script_dir"
-source "../scripts/detect-indent.sh"
+source "../scripts/functions/detect-indent.sh"
 
 function run-test() {
   local fixture_file="$1" expected_style="$2" expected_size="$3"
