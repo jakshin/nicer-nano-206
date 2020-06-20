@@ -1,10 +1,19 @@
 # Nicer-than-default settings for GNU nano v2.0.6 on macOS
 
-Apple ships a very old version of GNU nano on macOS, with very minimal configuration. It could easily be a bit nicer -- this repo tries to do that, in a way that makes installation a snap.
+Apple ships a very old version of GNU nano on macOS, with very minimal configuration. It could easily be a bit nicer -- this repo tries to do that, in a way that makes installation a snap. In fact, it can be installed with a **single line of shell script**.
 
-It's certainly possible to install the newest version of nano using [Homebrew](https://brew.sh), configure it, and then install online [syntax](https://github.com/scopatz/nanorc) [definitions](https://github.com/richrad/nanorc-mac), but sometimes that process feels heavyweight, especially if Homebrew isn't already installed, and/or if you only use nano occasionally anyway; as a lightweight alternative, **it's a one-liner in Terminal to install this repo's settings**.
+And what do you get for the low, low price of copy-pasting a single line into your terminal?   
+How about these fine features:
 
-You get some sensible default nano settings; cohesive syntax highighting in some common file types (based very loosely on the [Nord theme](https://www.nordtheme.com), and translated to the 16-color palette nano v2.0.6 supports); and an optional wrapper script for nano that can adjust its indentation settings on the fly, using either [EditorConfig](https://editorconfig.org) settings (if you have an `editorconfig` CLI installed), or by checking to see whether files being opened in nano are already indented with tabs or spaces.
+* Humane default settings for nano
+* Cohesive syntax highighting in some common file types (based very loosely on the [Nord theme](https://www.nordtheme.com), and translated to the 16-color palette nano v2.0.6 supports)
+* Bash and zsh completions for nano's options (with a handy description of each option, in zsh)
+
+But wait, there's more!
+
+* And an optional wrapper script for nano that adjust its indentation settings on the fly, using either [EditorConfig](https://editorconfig.org) settings (if you have an `editorconfig` CLI installed), or by checking to see whether files being opened in nano are already indented with tabs or spaces -- now it can be as unlikely to mis-indent a file in nano as in any other editor
+
+_You're gonna have an exciting life now!_
 
 
 ## Installing and uninstalling
@@ -29,3 +38,9 @@ Take a look at the extensive comments at the top of [nano206++.sh](./scripts/nan
 ## Compatibility
 
 To work on macOS's nano v2.0.6, these syntax definitions use `[[:<:]]` and `[[:>:]]` to match word boundaries (not  `\<` and `\>`, or `\b`), and `[[:space:]]` to match whitespace (not `\s`). Sadly, this makes them incompatible with recent versions of nano.
+
+<!--
+Other collections of syntax definitions, for more recent nano versions:
+https://github.com/scopatz/nanorc
+https://github.com/richrad/nanorc-mac (themed)
+-->
