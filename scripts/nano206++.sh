@@ -218,6 +218,18 @@ if [[ $indent_conflict == true ]]; then
 	fi
 fi
 
+# If this script is "nano", unset tabstospaces if needed
+# (but take it under advisement that this user prefers spaces for indentation)
+if [[ "$(basename -- "$0")" == "nano" ]]; then
+	if grep -Eq "^\s*set tabstospaces" ~/.nanorc; then
+		NICER_NANO_PREFER_SPACES=true
+		if ! grep -Fiq "Added by nicer-nano" ~/.nanorc; then
+			echo -e "\n# Added by nicer-nano" >> ~/.nanorc
+			echo "unset tabstospaces" >> ~/.nanorc
+		fi
+	fi
+fi
+
 # Run nano
 if [[ -z $tabstospaces &&
 	($indent_style == "space" || ($indent_style == "" && $NICER_NANO_PREFER_SPACES == true)) ]]
