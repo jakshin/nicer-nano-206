@@ -12,9 +12,9 @@ You get some sensible default nano settings; cohesive syntax highighting in some
 To **install**, just clone the repo and run its configuration script in Terminal:   
 `git clone https://github.com/jakshin/nicer-nano-206.git ~/.nicer-nano && ~/.nicer-nano/configure.sh`
 
-_(You can clone the repo anywhere you like, `~/.nicer-nano` is just an example.)_
+_(You can clone the repo anywhere you like, `~/.nicer-nano` is just an example. And if you prefer manual installation, there are instructions in each subdirectory's README.md.)_
 
-To **uninstall**, run `configure.sh` again and say No to each option, then delete your clone of the repo. Depending on which options you installed, you might have backup of your `~/.bashrc` and/or `~/.zshrc` files, with an `.nicer-nano-backup` extension, which you can also delete.
+To **uninstall**, run `configure.sh` again and say No to each option, then delete your clone of the repo. Depending on which options you installed, you might also have backups of your `~/.bashrc` and/or `~/.zshrc` files, with a `.nicer-nano-backup` extension, which you may want to delete.
 
 
 ## Using the nano wrapper script
