@@ -1,15 +1,17 @@
 #!/bin/bash -e
+# Copyright (c) 2020 Jason Jackson. MIT License.
+
 ## Configures nicer settings for nano, by creating/removing various symlinks,
 ## and editing ~/.bashrc and/or ~/.zshrc (backups are created first).
 ## This is only intended for use on macOS with GNU nano v2.0.6.
 ##
 ## Usage: configure.sh
 ##
-## You'll be prompted about which settings you'd like to install,
-## and before replacing any existing files.
+## You'll be asked which settings you'd like to install (or uninstall),
+## and prompted before replacing any existing files.
 
 if [[ $1 == "-h" || $1 == "--help" ]]; then
-	grep -E "^##" "$0"
+	grep -E "^##" "$0" | sed -E 's/## ?//'
 	exit
 fi
 
