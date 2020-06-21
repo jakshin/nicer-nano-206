@@ -11,7 +11,8 @@ set suspend
 set tabsize 4
 
 # Automatic indentation is handy when writing/editing indented files like code,
-# but super-annoying when pasting code into nano v2.0.6, so default it off (Alt+I toggles it)
+# but super-annoying when pasting indented text into nano v2.0.6, so default it off
+# (Alt+I toggles it while nano is running)
 unset autoindent
 
 # Default to indenting with hard tabs -- needed for nano206++.sh to work correctly,
@@ -22,6 +23,12 @@ unset autoindent
 # put this in ~/.bashrc and/or ~/.zshrc to make nano206++.sh default to indenting with spaces:
 # export NICER_NANO_PREFER_SPACES=true
 unset tabstospaces
+
+# Nano doesn't have an "undo" feature, so let's back up edited files...
+# but let's also stuff them in a temp directory to keep them out of the way
+# (Alt+B toggles backups on/off while nano is running)
+set backup
+set backupdir /private/tmp
 
 # Syntax highlighting
 include "~/.nano-syntax/bash.nanorc"
