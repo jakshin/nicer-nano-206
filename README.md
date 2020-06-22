@@ -13,6 +13,8 @@ But wait, there's more!
 
 * And an optional wrapper script for nano that adjust its indentation settings on the fly, using either [EditorConfig](https://editorconfig.org) settings (if you have an `editorconfig` CLI installed), or by checking to see whether files being opened in nano are already indented with tabs or spaces -- now it can be as unlikely to mis-indent a file in nano as in any other editor
 
+* Act now and at no additional cost to you, the wrapper script will also automatically enable spell-checking in nano, if you have a compatible spell-checker installed (aspell, hunspell, or ispell -- all of which are available from [Homebrew](https://brew.sh))
+
 _You're gonna have an exciting life now!_
 
 
@@ -28,11 +30,11 @@ To **uninstall**, run `configure.sh` again and say No to each option, then delet
 
 ## Using the nano wrapper script
 
-The `nano206++.sh` file is a wrapper script, which passes its arguments to the real nano, after first trying to figure out the best indentation settings for the file(s) being edited, and adjusting nano's command line to tailor its indentation behavior to the situation at hand. It's intended to be symlinked as `/usr/local/bin/nano` so that when you invoke "nano", it runs instead of the real nano.
+The `nano206++.sh` script is a wrapper for nano, which passes its arguments to the real nano, after first (1) trying to figure out the best indentation settings for the file(s) being edited, and adjusting nano's command line to tailor its indentation behavior to the situation at hand; and (2) checking for the presence of a spell-checker, and if one is found, automatically configuring nano to use it.
 
-It first tries to use [EditorConfig](https://editorconfig.org) settings, as reported by the `editorconfig` CLI. This works on both existing and new files, since finding a relevant `.editorconfig` file only depends on the edited file's path. If the editorconfig CLI isn't installed, or no applicable `.editorconfig` is found, the script falls back to reading the file(s) being edited, and attempting to detect the indentation style already in use in the file; of course, that only works on files that already exist.
+It's intended to be symlinked as `/usr/local/bin/nano` so that when you invoke "nano", it runs instead of the real nano. Once it's installed, just run `nano ...` like you normally would.
 
-Take a look at the extensive comments at the top of [nano206++.sh](./scripts/nano206++.sh) for details, including ways to customize the script's behavior.
+For more details, including ways to customize its behavior, take a look at the extensive comments at the top of [nano206++.sh](./scripts/nano206++.sh).
 
 
 ## Compatibility

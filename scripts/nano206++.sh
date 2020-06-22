@@ -44,7 +44,8 @@
 declare -a files
 maybe_file=""        # Arguments that start with "+" might or might not be file names
 options_ended=false  # Options can be interspersed with file names, but "--" ends all options
-tabsize_value_needed=false
+other_optarg=""      # An option argument other than for -s/--speller or -T/--tabsize
+speller=""
 tabsize=""
 tabstospaces=""
 will_edit=true
@@ -56,10 +57,15 @@ for arg; do
 	[[ $arg == "--tabs" && $options_ended == false ]] || set -- "$@" "$arg"
 
 	# Process the argument
-	if [[ $tabsize_value_needed == true ]]; then
-		tabsize_value_needed=false
+	if [[ $tabsize == "pending" ]]; then
 		tabsize="$arg"
 		continue
+	elif [[ $speller == "pending" ]]; then
+		speller="$arg"
+		continue
+	elif [[ $other_optarg == "pending" ]]; then
+		other_optarg=""  # We don't care what the option's argument value actually is,
+		continue         # we just need to avoid handling it as an option or file name
 	fi
 
 	if [[ $options_ended == false && $arg == -* && $arg != - ]]; then
@@ -70,11 +76,13 @@ for arg; do
 		elif [[ "--help" == "$arg"* || "--version" == "$arg"* ]]; then
 			will_edit=false  # Nano will error on --h or --v; --he or longer and --ve or longer work
 
-		elif [[ $arg == "--tabsize" || $arg == "--tabsiz" || $arg == "--tabsi" ||
-			$arg == "--tabsize="* || $arg == "--tabsiz="* || $arg == "--tabsi="* ]]
-		then
+		elif [[ ("--speller" == "$arg"* || "--speller" == "${arg//=*/}"*) && $arg == "--sp"* ]]; then
+			# If an equal sign is present, the rest of the arg is spell checker, else the next arg is
+			[[ $arg == *=* ]] && speller="${arg//*=/}" || speller="pending"
+
+		elif [[ ("--tabsize" == "$arg"* || "--tabsize" == "${arg//=*/}"*) && $arg == "--tabsi"* ]]; then
 			# If an equal sign is present, the rest of the arg is tab size, else the next arg is
-			[[ $arg == *=* ]] && tabsize="${arg//*=/}" || tabsize_value_needed=true
+			[[ $arg == *=* ]] && tabsize="${arg//*=/}" || tabsize="pending"
 
 		elif [[ "--tabstospaces" == "$arg"* && "$arg" == "--tabst"* ]]; then
 			tabstospaces=true
@@ -98,13 +106,13 @@ for arg; do
 				elif [[ $ch == "E" ]]; then
 					tabstospaces=true
 				elif [[ $ch == "T" ]]; then
-					# If characters follow a T option, the rest of the arg is tab size, else the next arg is
-					if (( i < last_index )); then
-						tabsize="${arg:$i+1}"
-					else
-						tabsize_value_needed=true
-					fi
-				elif [[ "CQYors" == *$ch* ]]; then
+					# If characters immediately follow a single-char option,
+					# the rest of $arg is its optarg, otherwise the next argument is
+					(( i < last_index )) && tabsize="${arg:$i+1}" || tabsize="pending"
+				elif [[ $ch == "s" ]]; then
+					(( i < last_index )) && speller="${arg:$i+1}" || speller="pending"
+				elif [[ "CQYor" == *$ch* ]]; then
+					(( i < last_index )) || other_optarg="pending"
 					continue  # The rest of this argument, if any, is optarg
 				fi
 			done
@@ -132,6 +140,10 @@ done
 
 if [[ -n $maybe_file ]]; then
 	files+=("$maybe_file")
+fi
+
+if [[ "${tabsize}${speller}${other_optarg}" == *"pending"* ]]; then
+	will_edit=false
 fi
 
 # Detect indentation, if needed
@@ -218,14 +230,28 @@ if [[ $indent_conflict == true ]]; then
 	fi
 fi
 
-# If this script is "nano", unset tabstospaces if needed
-# (but take it under advisement that this user prefers spaces for indentation)
-if [[ "$(basename -- "$0")" == "nano" ]]; then
-	if grep -Eq "^\s*set tabstospaces" ~/.nanorc; then
-		NICER_NANO_PREFER_SPACES=true
-		if ! grep -Fiq "Added by nicer-nano" ~/.nanorc; then
-			echo -e "\n# Added by nicer-nano" >> ~/.nanorc
-			echo "unset tabstospaces" >> ~/.nanorc
+if [[ $will_edit == true ]]; then
+	# Enable spell-checking
+	if [[ -n $SPELL || -n $speller ]] || grep -Eq "^\s*set speller" ~/.nanorc; then
+		# A spell-checker has already been configured/requested
+		true
+	elif type -p aspell > /dev/null; then
+		export SPELL='aspell check'
+	elif type -p hunspell > /dev/null; then
+		export SPELL='hunspell'
+	elif type -p ispell > /dev/null; then
+		export SPELL='ispell -M'
+	fi
+
+	# If this script is "nano", unset tabstospaces if needed
+	# (but take it under advisement that this user prefers spaces for indentation)
+	if [[ "$(basename -- "$0")" == "nano" ]]; then
+		if grep -Eq "^\s*set tabstospaces" ~/.nanorc; then
+			NICER_NANO_PREFER_SPACES=true
+			if ! grep -Fiq "Added by nicer-nano" ~/.nanorc; then
+				echo -e "\n# Added by nicer-nano" >> ~/.nanorc
+				echo "unset tabstospaces" >> ~/.nanorc
+			fi
 		fi
 	fi
 fi

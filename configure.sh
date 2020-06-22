@@ -264,7 +264,8 @@ echo-header "Use the nano wrapper script?"
 echo-wrapped "The nano206++.sh wrapper script takes over when you run 'nano' at a command line" \
 	"(or a program like Git runs it for you). It works just like the real nano does," \
 	"but it also configures nano's indentation settings on the fly, using EditorConfig" \
-	"and/or by detecting existing indentation in the file(s) you edit." \
+	"and/or by detecting existing indentation in the file(s) you're about to edit," \
+	"and also enables spell-checking automatically if it finds an installed spell-checker." \
 	"A symlink will be created at /usr/local/bin/nano to enable the script."
 prompt "You want?"
 
